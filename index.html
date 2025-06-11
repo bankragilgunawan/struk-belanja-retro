@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Struk Belanja Retro</title>
+
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="assets/icon.png" />
+  <meta name="theme-color" content="#4A90E2" />
+
+  <style>
+    body {
+      font-family: Courier, monospace;
+      background: #e0f7fa;
+      padding: 20px;
+      animation: fadeIn 1s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <h1>🧾 Struk Belanja Retro</h1>
+  <p>Contoh struk bisa disimpan atau dicetak.</p>
+
+  <button onclick="simpanStruk()">Simpan Gambar</button>
+
+  <div id="struk" style="margin-top:20px; background:white; padding:10px;">
+    <h2>🛍️ TOKO MAJU JAYA</h2>
+    <p>Tanggal: 10 Juni 2025</p>
+    <p>Barang: 1x Sabun, 2x Mie Instan</p>
+    <p>Total: Rp15.000</p>
+  </div>
+
+  <script src="assets/html2canvas.min.js"></script>
+  <script>
+    function simpanStruk() {
+      html2canvas(document.querySelector("#struk")).then(canvas => {
+        const link = document.createElement("a");
+        link.download = "struk.png";
+        link.href = canvas.toDataURL();
+        link.click();
+      });
+    }
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(reg => console.log('✅ Service worker registered'))
+        .catch(err => console.error('❌ Service worker failed', err));
+    }
+  </script>
+</body>
+</html>
