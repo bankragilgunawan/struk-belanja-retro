@@ -4,52 +4,177 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Struk Belanja Retro</title>
-
   <link rel="manifest" href="manifest.json" />
-  <link rel="icon" href="assets/icon.png" />
-  <meta name="theme-color" content="#4A90E2" />
-
   <style>
     body {
-      font-family: Courier, monospace;
-      background: #e0f7fa;
+      font-family: 'Courier New', Courier, monospace;
+      background-color: #e3f2fd;
+      margin: 0;
       padding: 20px;
-      animation: fadeIn 1s ease;
+      animation: fadeInBody 1s ease-in;
     }
-    @keyframes fadeIn {
+
+    @keyframes fadeInBody {
       from { opacity: 0; }
-      to   { opacity: 1; }
+      to { opacity: 1; }
+    }
+
+    h1 {
+      text-align: center;
+      color: #1565c0;
+      margin-bottom: 5px;
+    }
+
+    .credit {
+      text-align: center;
+      font-size: 12px;
+      color: #555;
+      margin-bottom: 20px;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: auto;
+      background: #fff;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 10px;
+    }
+
+    input[type="text"], input[type="number"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+
+    button, .btn {
+      background-color: #1565c0;
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 10px;
+      transition: background-color 0.3s;
+    }
+
+    button:hover, .btn:hover {
+      background-color: #0d47a1;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .btn-wa {
+      background-color: #25D366;
+    }
+
+    .btn-wa:hover {
+      background-color: #128C7E;
+    }
+
+    .receipt {
+      background: #f4f4f4;
+      padding: 15px;
+      border: 1px dashed #888;
+      margin-top: 20px;
+      border-radius: 6px;
+      white-space: pre-wrap;
+    }
+
+    .hidden {
+      display: none;
     }
   </style>
 </head>
 <body>
-  <h1>🧾 Struk Belanja Retro</h1>
-  <p>Contoh struk bisa disimpan atau dicetak.</p>
+  <div class="container">
+    <h1>🧾 Struk Belanja</h1>
+    <p class="credit">By: bankragilgunawan@gmail.com</p>
 
-  <button onclick="simpanStruk()">Simpan Gambar</button>
+    <label>Nama Barang:</label>
+    <input type="text" id="item" placeholder="Contoh: Mie Instan" />
 
-  <div id="struk" style="margin-top:20px; background:white; padding:10px;">
-    <h2>🛍️ TOKO MAJU JAYA</h2>
-    <p>Tanggal: 10 Juni 2025</p>
-    <p>Barang: 1x Sabun, 2x Mie Instan</p>
-    <p>Total: Rp15.000</p>
+    <label>Jumlah:</label>
+    <input type="number" id="qty" placeholder="Contoh: 2" />
+
+    <label>Harga Satuan:</label>
+    <input type="number" id="price" placeholder="Contoh: 3000" />
+
+    <button onclick="tambahData()">+ Tambahkan</button>
+
+    <div class="receipt hidden" id="hasil"></div>
+
+    <div class="btn-group hidden" id="aksi">
+      <a id="waBtn" class="btn btn-wa" target="_blank">📤 WhatsApp</a>
+      <button class="btn" onclick="unduhGambar()">📥 Download</button>
+    </div>
   </div>
 
-  <script src="assets/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script>
-    function simpanStruk() {
-      html2canvas(document.querySelector("#struk")).then(canvas => {
-        const link = document.createElement("a");
-        link.download = "struk.png";
-        link.href = canvas.toDataURL();
-        link.click();
-      });
+    let daftar = [];
+    const hasil = document.getElementById("hasil");
+    const aksi = document.getElementById("aksi");
+    const waBtn = document.getElementById("waBtn");
+
+    function tambahData() {
+      const item = document.getElementById("item").value.trim();
+      const qty = parseInt(document.getElementById("qty").value);
+      const price = parseInt(document.getElementById("price").value);
+
+      if (!item || isNaN(qty) || isNaN(price)) return alert("Lengkapi data dulu!");
+
+      daftar.push({ item, qty, total: qty * price });
+      document.getElementById("item").value = '';
+      document.getElementById("qty").value = '';
+      document.getElementById("price").value = '';
+
+      tampilkanStruk();
     }
 
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js')
-        .then(reg => console.log('✅ Service worker registered'))
-        .catch(err => console.error('❌ Service worker failed', err));
+    function tampilkanStruk() {
+      let teks = "*Struk Belanja Saya 🧾*\n\n";
+      let total = 0;
+
+      daftar.forEach((d, i) => {
+        teks += `${i+1}. ${d.item} (${d.qty}x) - Rp ${d.total.toLocaleString("id-ID")}\n`;
+        total += d.total;
+      });
+
+      const tgl = new Date().toLocaleDateString("id-ID");
+      teks += `\n🧮 Total: Rp ${total.toLocaleString("id-ID")}\n📅 Tanggal: ${tgl}\n\nTerima kasih! 🙏`;
+
+      hasil.textContent = teks;
+      hasil.classList.remove("hidden");
+      aksi.classList.remove("hidden");
+
+      waBtn.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(teks)}`;
+    }
+
+    function unduhGambar() {
+      html2canvas(document.getElementById("hasil")).then(canvas => {
+        const a = document.createElement("a");
+        a.download = "Struk_Belanja.png";
+        a.href = canvas.toDataURL();
+        a.click();
+      });
     }
   </script>
 </body>
