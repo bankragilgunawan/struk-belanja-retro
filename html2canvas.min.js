@@ -1,0 +1,1 @@
+// Dummy html2canvas.min.js for demo purpose only
